@@ -114,7 +114,7 @@ public class MapsActivity extends FragmentActivity {
 
             while ((line = csvReader.readNext()) != null) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
-                        .title(line[6])/*.icon(BitmapDescriptorFactory.fromResource(R.drawable.tree))*/);
+                        .title(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
             }
         } catch (IOException e) {
