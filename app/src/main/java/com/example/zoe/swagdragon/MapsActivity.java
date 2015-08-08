@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -42,7 +43,7 @@ public class MapsActivity extends FragmentActivity {
             //addTreeToMap(treeList.get(i));
 
             mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(treeList.get(i)[0]), Double.parseDouble(treeList.get(i)[1])))
-                    .title(treeList.get(i)[6]));
+                    .title(treeList.get(i)[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
 
         }
 
@@ -91,7 +92,7 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(-36.848460,174.763332)).title("Marker"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(-36.848460,174.763332)).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
         /**enable location services*/
        /* mMap.setMyLocationEnabled(true);
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
