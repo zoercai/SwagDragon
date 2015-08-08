@@ -1,15 +1,16 @@
 package com.example.zoe.swagdragon;
 
+import android.app.NotificationManager;
 import android.content.res.AssetManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.content.Context;
 import android.location.Criteria;
@@ -21,8 +22,6 @@ import com.opencsv.CSVReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MapsActivity extends FragmentActivity {
 
@@ -35,6 +34,16 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         setUpTreeData();
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.treenotify);
+        mBuilder.setContentTitle("New trees detected around you!");
+        mBuilder.setContentText("There are new notable trees around you, check it out and leave a message!");
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
     }
 
 
@@ -122,5 +131,9 @@ public class MapsActivity extends FragmentActivity {
             Log.e("********","You are experiencing a java IOException");
             Log.e("*********",e.toString());
         }
+    }
+
+    private void notifyTree(){
+
     }
 }
