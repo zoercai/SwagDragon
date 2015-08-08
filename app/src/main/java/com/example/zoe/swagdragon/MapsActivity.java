@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.opencsv.CSVReader;
 
@@ -20,13 +21,17 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private ArrayList<String[]> treeList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        setUpTreeData();
+        treeList = setUpTreeData();
+        for (int i= 0; i < treeList.size(); i++) {
+            addTreeToMap(treeList.get(i));
+        }
     }
 
     @Override
@@ -73,13 +78,13 @@ public class MapsActivity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
-    private void setUpTreeData() {
+    private ArrayList setUpTreeData() {
+        List treeList = new ArrayList<String[]>();
         try {
             AssetManager assetManager = getAssets();
             InputStream csvStream = assetManager.open("app/src/main/assets/PUP_NotableTrees.csv");
             InputStreamReader csvStreamReader = new        InputStreamReader(csvStream);
             CSVReader csvReader = new CSVReader(csvStreamReader);
-            List treeList = new ArrayList<String[]>();
             String[] line;
 
             // throw away the header
@@ -92,5 +97,12 @@ public class MapsActivity extends FragmentActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return (ArrayList) treeList;
+    }
+
+    private void addTreeToMap(String[] tree) {
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(Double.parseDouble(tree[0]), Double.parseDouble(tree[1])))
+                .title(tree[6]));
     }
 }
