@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -28,15 +29,26 @@ public class MapsActivity extends FragmentActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private ArrayList<String[]> treeList;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        treeList = setUpTreeData();
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        treeList = setUpTreeData();
+
         for (int i= 0; i < treeList.size(); i++) {
-            addTreeToMap(treeList.get(i));
+            //addTreeToMap(treeList.get(i));
+
+            mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(treeList.get(i)[0]), Double.parseDouble(treeList.get(i)[1])))
+                    .title(treeList.get(i)[6]));
+
         }
+
+        Log.d("**debugging**", treeList.toString());
+
+
     }
 
     @Override
@@ -64,8 +76,7 @@ public class MapsActivity extends FragmentActivity {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -80,33 +91,31 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-
-        //enable location services
-        mMap.setMyLocationEnabled(true);
+        mMap.addMarker(new MarkerOptions().position(new LatLng(-36.848460,174.763332)).title("Marker"));
+        /**enable location services*/
+       /* mMap.setMyLocationEnabled(true);
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
         Location myLocation = locationManager.getLastKnownLocation(provider);
-
-
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         double latitude = myLocation.getLatitude();
         double longitude = myLocation.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
+        LatLng latLng = new LatLng(latitude, longitude); */
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        //LatLng latLng = new LatLng(36.8406,174.7400);
+
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+
     }
 
     private ArrayList setUpTreeData() {
         List treeList = new ArrayList<String[]>();
         try {
             AssetManager assetManager = getAssets();
-            InputStream csvStream = assetManager.open("app/src/main/assets/PUP_NotableTrees.csv");
-            InputStreamReader csvStreamReader = new        InputStreamReader(csvStream);
+            InputStream csvStream = assetManager.open("PUP_NotableTrees.csv");
+            InputStreamReader csvStreamReader = new InputStreamReader(csvStream);
             CSVReader csvReader = new CSVReader(csvStreamReader);
             String[] line;
 
@@ -115,17 +124,20 @@ public class MapsActivity extends FragmentActivity {
 
             while ((line = csvReader.readNext()) != null) {
                 treeList.add(line);
-                Log.v("line", line+"");
+                Log.v("*******line*****", line[0] + "" + line[1] + " " + line[6] + "");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Log.e("********","You are experiencing a java IOException");
+            Log.e("*********",e.toString());
         }
         return (ArrayList) treeList;
     }
 
-    private void addTreeToMap(String[] tree) {
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(Double.parseDouble(tree[0]), Double.parseDouble(tree[1])))
+    /*private void addTreeToMap(String[] tree) {
+        mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(tree[0]), Double.parseDouble(tree[1])))
                 .title(tree[6]));
-    }
+
+
+    }*/
 }
