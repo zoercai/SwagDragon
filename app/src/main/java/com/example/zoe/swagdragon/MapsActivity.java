@@ -1,27 +1,42 @@
 package com.example.zoe.swagdragon;
 
+import android.content.res.AssetManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.opencsv.CSVReader;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private ArrayList<String[]> treeList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        treeList = setUpTreeData();
+        for (int i= 0; i < treeList.size(); i++) {
+            addTreeToMap(treeList.get(i));
+        }
     }
 
     @Override
@@ -84,5 +99,33 @@ public class MapsActivity extends FragmentActivity {
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+    }
+
+    private ArrayList setUpTreeData() {
+        List treeList = new ArrayList<String[]>();
+        try {
+            AssetManager assetManager = getAssets();
+            InputStream csvStream = assetManager.open("app/src/main/assets/PUP_NotableTrees.csv");
+            InputStreamReader csvStreamReader = new        InputStreamReader(csvStream);
+            CSVReader csvReader = new CSVReader(csvStreamReader);
+            String[] line;
+
+            // throw away the header
+            csvReader.readNext();
+
+            while ((line = csvReader.readNext()) != null) {
+                treeList.add(line);
+                Log.v("line", line+"");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return (ArrayList) treeList;
+    }
+
+    private void addTreeToMap(String[] tree) {
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(Double.parseDouble(tree[0]), Double.parseDouble(tree[1])))
+                .title(tree[6]));
     }
 }
