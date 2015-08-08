@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -25,19 +26,17 @@ import java.util.List;
 
 public class MapsActivity extends FragmentActivity {
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private ArrayList<String[]> treeList;
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        treeList = setUpTreeData();
-        for (int i= 0; i < treeList.size(); i++) {
-            addTreeToMap(treeList.get(i));
-        }
+        setUpTreeData();
     }
+
 
     @Override
     protected void onResume() {
@@ -99,14 +98,14 @@ public class MapsActivity extends FragmentActivity {
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+
     }
 
-    private ArrayList setUpTreeData() {
-        List treeList = new ArrayList<String[]>();
+    private void setUpTreeData() {
         try {
             AssetManager assetManager = getAssets();
-            InputStream csvStream = assetManager.open("app/src/main/assets/PUP_NotableTrees.csv");
-            InputStreamReader csvStreamReader = new        InputStreamReader(csvStream);
+            InputStream csvStream = assetManager.open("PUP_NotableTrees.csv");
+            InputStreamReader csvStreamReader = new InputStreamReader(csvStream);
             CSVReader csvReader = new CSVReader(csvStreamReader);
             String[] line;
 
@@ -114,18 +113,14 @@ public class MapsActivity extends FragmentActivity {
             csvReader.readNext();
 
             while ((line = csvReader.readNext()) != null) {
-                treeList.add(line);
-                Log.v("line", line+"");
+                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
+                        .title(line[6])/*.icon(BitmapDescriptorFactory.fromResource(R.drawable.tree))*/);
+                Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Log.e("********","You are experiencing a java IOException");
+            Log.e("*********",e.toString());
         }
-        return (ArrayList) treeList;
-    }
-
-    private void addTreeToMap(String[] tree) {
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(Double.parseDouble(tree[0]), Double.parseDouble(tree[1])))
-                .title(tree[6]));
     }
 }
