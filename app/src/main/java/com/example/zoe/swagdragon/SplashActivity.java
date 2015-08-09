@@ -13,12 +13,34 @@ public class SplashActivity extends Activity {
 
     /** Duration of wait **/
     private final int SPLASH_DISPLAY_LENGTH = 1000;
+    TextView taglineText;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_splash);
+
+        //generate random welcome message
+        taglineText = (TextView) findViewById(R.id.splash_tagline);
+
+        int random = (int)(Math.random()*100 +1);
+
+        if (random >= 1 && random <= 20){
+            taglineText.setText(R.string.splash_tagline_one);
+        } else if (random >= 21 && random <= 40){
+            taglineText.setText(R.string.splash_tagline_two);
+        }else if (random >= 41 && random <= 60){
+            taglineText.setText(R.string.splash_tagline_three);
+        }else if (random >= 61 && random <= 80){
+            taglineText.setText(R.string.splash_tagline_four);
+        }else {
+            taglineText.setText(R.string.splash_tagline_five);
+        }
+
+
+
+
 
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
