@@ -91,7 +91,7 @@ public class NotificationService extends Service implements LocationListener {
             Location treeLocation = new Location("");
             treeLocation.setLatitude(closeTrees.get(i).latitude);
             treeLocation.setLongitude(closeTrees.get(i).longitude);
-            if (location.distanceTo(treeLocation) < 25) {
+            if (location.distanceTo(treeLocation) < 250) {
                 // notificationID allows you to update the notification later on.
                 mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 mNotificationManager.notify(1, mBuilder.build());

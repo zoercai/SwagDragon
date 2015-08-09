@@ -31,7 +31,7 @@ import java.io.InputStreamReader;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener, LocationListener {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
     public ArrayList<Marker> treeMarkers = new ArrayList<Marker>();
 
@@ -154,6 +154,40 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
         startActivity(intent);
         // Need to get the info from the tree being clicked
         return true;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Getting latitude of the current location
+        double latitude = location.getLatitude();
+
+        // Getting longitude of the current location
+        double longitude = location.getLongitude();
+
+        // Creating a LatLng object for the current location
+        LatLng latLng = new LatLng(latitude, longitude);
+
+        // Showing the current location in Google Map
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        // Zoom in the Google Map
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }
 
