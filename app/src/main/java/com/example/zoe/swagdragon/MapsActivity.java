@@ -34,10 +34,6 @@ import java.util.ArrayList;
 public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
     public ArrayList<Marker> treeMarkers = new ArrayList<Marker>();
-    public ArrayList<Marker> closeTrees = new ArrayList<Marker>();
-    private Location origin;
-    private NotificationCompat.Builder mBuilder;
-    NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +46,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
 
         Intent intent = new Intent(this, NotificationService.class);
         this.startService(intent);
-
-
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // notificationID allows you to update the notification later on.
-        mNotificationManager.notify(1, mBuilder.build());
 
     }
     /**
@@ -119,7 +109,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
         Location myLocation = locationManager.getLastKnownLocation(provider);
-        /*locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,0, this);*/
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         double latitude = myLocation.getLatitude();
@@ -151,8 +140,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
                 mMap.setOnMarkerClickListener(this);
             }
-            //origin = getMyLocation();
-            //closeTrees = createCloseTreeArray(treeMarkers);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("********", "You are experiencing a java IOException");
