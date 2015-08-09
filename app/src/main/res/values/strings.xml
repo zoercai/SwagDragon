@@ -2,7 +2,18 @@
     <string name="app_name">SwagDragon</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_tagline">FINDING HOT SAPLINGS IN YOUR AREA...</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="splash_tagline_one">GOT SAP?</string>
+    <string name="splash_tagline_two">PLANTING TREES...</string>
+    <string name="splash_tagline_three">FINDING HOT SAPLINGS IN YOUR AREA...</string>
+    <string name="splash_tagline_four">LOOKING FOR SOME WOOD?</string>
+    <string name="splash_tagline_five">THE BEST TIME TO PLANT A TREE IS NOW</string>
+
     <string name="action_settings">Settings</string>
+
+    <string name="desc_label">Description</string>
+    <string name="leave_message">Change this Tree\'s Message</string>
+    <string name="defaultText">This tree is almost as SWAG as the judges. \n Some rad dragons have even been known to roost in this swag tree</string>
+
 </resources>

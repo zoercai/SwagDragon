@@ -6,6 +6,8 @@ import android.content.res.AssetManager;
 import android.location.LocationListener;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -26,10 +28,10 @@ import com.opencsv.CSVReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity/* implements LocationListener */{
-
+public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
     public ArrayList<Marker> treeMarkers = new ArrayList<Marker>();
     public ArrayList<Marker> closeTrees = new ArrayList<Marker>();
@@ -45,17 +47,26 @@ public class MapsActivity extends FragmentActivity/* implements LocationListener
         setUpMapIfNeeded();
         setUpTreeData();
 
+
         Intent intent = new Intent(this, NotificationService.class);
         this.startService(intent);
-        /*
-        mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.treenotify);
-        mBuilder.setContentTitle("New trees detected around you!");
-        mBuilder.setContentText("There are new notable trees around you, check it out and leave a message!");
 
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);*/
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+
     }
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     * just add a marker near Africa.
+     * <p/>
+     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     */
+    private void notifyTree(){
 
+    }
 
     @Override
     protected void onResume() {
@@ -135,83 +146,27 @@ public class MapsActivity extends FragmentActivity/* implements LocationListener
                 Marker newMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
                         .title(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
                 treeMarkers.add(newMarker);
+                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
+                        .title(line[6]) .snippet(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
+                mMap.setOnMarkerClickListener(this);
             }
             //origin = getMyLocation();
             //closeTrees = createCloseTreeArray(treeMarkers);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("********","You are experiencing a java IOException");
-            Log.e("*********",e.toString());
+            Log.e("********", "You are experiencing a java IOException");
+            Log.e("*********", e.toString());
         }
     }
 
-    /*@Override
-    public void onLocationChanged(Location location) {
-        Log.v("**********called*******", "LOCATION CHANGED");
-        for( int i=0;i<closeTrees.size();i++){
-            Location treeLocation = new Location("");
-            treeLocation.setLatitude(closeTrees.get(i).getPosition().latitude);
-            treeLocation.setLongitude(closeTrees.get(i).getPosition().longitude);
-            if (location.distanceTo(treeLocation) < 250) {
-                // notificationID allows you to update the notification later on.
-                Log.v("****TREE******", closeTrees.get(i).getTitle());
-                mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(1, mBuilder.build());
-            }
-        }
 
-        if (location.distanceTo(origin) > 250) {
-            origin = getMyLocation();
-            closeTrees = createCloseTreeArray(treeMarkers);
-        }
-
-    }*/
-
-    /*@Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }*/
-
-    private Location getMyLocation() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        String provider = locationManager.getBestProvider(criteria, true);
-        Location myLocation = locationManager.getLastKnownLocation(provider);
-
-        return myLocation;
-
-    }
-
-    /*private LatLng getMyLatLng(Location myLocation) {
-        double latitude = myLocation.getLatitude();
-        double longitude = myLocation.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
-        return latLng;
-    }*/
-
-    private ArrayList<Marker> createCloseTreeArray(ArrayList<Marker> list) {
-        Location myLocation = getMyLocation();
-        ArrayList<Marker> close = new ArrayList<Marker>();
-        for (int i = 0; i < list.size(); i++) {
-            Location treeLocation = new Location("");
-            treeLocation.setLatitude(list.get(i).getPosition().latitude);
-            treeLocation.setLongitude(list.get(i).getPosition().longitude);
-            if (myLocation.distanceTo(treeLocation) < 500) {
-                close.add(list.get(i));
-            }
-        }
-        return close;
+    public boolean onMarkerClick(Marker m) {
+        Intent intent = new Intent(this, TreeInfoActivity.class);
+        intent.putExtra(TreeInfoActivity.INFOEXTRA, m.getTitle());
+        startActivity(intent);
+        // Need to get the info from the tree being clicked
+        return true;
     }
 }
+
