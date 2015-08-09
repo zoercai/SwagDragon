@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -24,9 +26,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends FragmentActivity implements LocationListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
+    public ArrayList<Marker> treeMarkers = new ArrayList<Marker>();
+    public ArrayList<Marker> closeTrees = new ArrayList<Marker>();
+    private Location origin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,14 +118,67 @@ public class MapsActivity extends FragmentActivity {
             csvReader.readNext();
 
             while ((line = csvReader.readNext()) != null) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
+                Marker newMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
                         .title(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
+                treeMarkers.add(newMarker);
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
             }
+            origin = getMyLocation();
+            closeTrees = createCloseTreeArray(treeMarkers);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("********","You are experiencing a java IOException");
             Log.e("*********",e.toString());
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        for( int i=0;i<closeTrees.size();i++){
+            Location treeLocation = new Location("");
+            treeLocation.setLatitude(closeTrees.get(i).getPosition().latitude);
+            treeLocation.setLongitude(closeTrees.get(i).getPosition().longitude);
+            if (location.distanceTo(treeLocation) < 25) {
+                //TODO add notification code
+            }
+        }
+
+        if (location.distanceTo(origin) > 250) {
+            origin = getMyLocation();
+            closeTrees = createCloseTreeArray(treeMarkers);
+        }
+
+    }
+
+    private Location getMyLocation() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        Criteria criteria = new Criteria();
+        String provider = locationManager.getBestProvider(criteria, true);
+        Location myLocation = locationManager.getLastKnownLocation(provider);
+
+        return myLocation;
+
+    }
+
+    /*private LatLng getMyLatLng(Location myLocation) {
+        double latitude = myLocation.getLatitude();
+        double longitude = myLocation.getLongitude();
+        LatLng latLng = new LatLng(latitude, longitude);
+        return latLng;
+    }*/
+
+    private ArrayList<Marker> createCloseTreeArray(ArrayList<Marker> list){
+        Location myLocation = getMyLocation();
+        ArrayList<Marker> close = new ArrayList<Marker>();
+        for( int i=0;i<list.size();i++){
+            Location treeLocation = new Location("");
+            treeLocation.setLatitude(list.get(i).getPosition().latitude);
+            treeLocation.setLongitude(list.get(i).getPosition().longitude);
+            if (myLocation.distanceTo(treeLocation) < 500) {
+                close.add(list.get(i));
+            }
+        }
+        return close;
     }
 }
