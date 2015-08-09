@@ -1,9 +1,11 @@
 package com.example.zoe.swagdragon;
 
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -11,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.content.Context;
 import android.location.Criteria;
@@ -23,8 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class MapsActivity extends FragmentActivity {
-
+public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
 
     @Override
@@ -45,7 +47,15 @@ public class MapsActivity extends FragmentActivity {
         // notificationID allows you to update the notification later on.
         mNotificationManager.notify(1, mBuilder.build());
     }
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     * just add a marker near Africa.
+     * <p/>
+     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     */
+    private void notifyTree(){
 
+    }
 
     @Override
     protected void onResume() {
@@ -123,17 +133,22 @@ public class MapsActivity extends FragmentActivity {
 
             while ((line = csvReader.readNext()) != null) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
-                        .title(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
+                        .title(line[6]) .snippet(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
+                mMap.setOnMarkerClickListener(this);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("********","You are experiencing a java IOException");
-            Log.e("*********",e.toString());
+            Log.e("********", "You are experiencing a java IOException");
+            Log.e("*********", e.toString());
         }
     }
 
-    private void notifyTree(){
-
+    public boolean onMarkerClick(Marker m) {
+        Intent intent = new Intent(this, TreeInfoActivity.class);
+        intent.putExtra(TreeInfoActivity.INFOEXTRA, m.getSnippet());
+        startActivity(intent);
+        // Need to get the info from the tree being clicked
+        return true;
     }
 }

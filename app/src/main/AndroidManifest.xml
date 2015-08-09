@@ -37,6 +37,15 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" >
         </activity>
+
+        <activity
+            android:name=".TreeInfoActivity"
+            android:label="Tree Information"
+            android:parentActivityName=".MapsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MapsActivity" />
+        </activity>
     </application>
 
 </manifest>

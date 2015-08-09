@@ -1,17 +1,26 @@
 package com.example.zoe.swagdragon;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public class TreeInfoActivity extends AppCompatActivity {
+    public static final String INFOEXTRA = "TREE_INFO_EXTRA_INFO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tree_info2);
+        setContentView(R.layout.activity_tree_info);
+
+        Intent i = getIntent();
+        String desc = i.getStringExtra(INFOEXTRA);
+        TextView t = (TextView)findViewById(R.id.textfield);
+        t.setText(desc);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
