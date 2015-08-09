@@ -1,11 +1,14 @@
 package com.example.zoe.swagdragon;
 
+import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.location.LocationListener;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -24,14 +27,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements LocationListener {
+public class MapsActivity extends FragmentActivity/* implements LocationListener */{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
     public ArrayList<Marker> treeMarkers = new ArrayList<Marker>();
     public ArrayList<Marker> closeTrees = new ArrayList<Marker>();
     private Location origin;
+    private NotificationCompat.Builder mBuilder;
+    NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         setUpTreeData();
+
+        Intent intent = new Intent(this, NotificationService.class);
+        this.startService(intent);
+        /*
+        mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.treenotify);
+        mBuilder.setContentTitle("New trees detected around you!");
+        mBuilder.setContentText("There are new notable trees around you, check it out and leave a message!");
+
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);*/
     }
 
 
@@ -94,7 +108,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
         Location myLocation = locationManager.getLastKnownLocation(provider);
-
+        /*locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,0, this);*/
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         double latitude = myLocation.getLatitude();
@@ -123,8 +137,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                 treeMarkers.add(newMarker);
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
             }
-            origin = getMyLocation();
-            closeTrees = createCloseTreeArray(treeMarkers);
+            //origin = getMyLocation();
+            //closeTrees = createCloseTreeArray(treeMarkers);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("********","You are experiencing a java IOException");
@@ -132,14 +146,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         }
     }
 
-    @Override
+    /*@Override
     public void onLocationChanged(Location location) {
+        Log.v("**********called*******", "LOCATION CHANGED");
         for( int i=0;i<closeTrees.size();i++){
             Location treeLocation = new Location("");
             treeLocation.setLatitude(closeTrees.get(i).getPosition().latitude);
             treeLocation.setLongitude(closeTrees.get(i).getPosition().longitude);
-            if (location.distanceTo(treeLocation) < 25) {
-                //TODO add notification code
+            if (location.distanceTo(treeLocation) < 250) {
+                // notificationID allows you to update the notification later on.
+                Log.v("****TREE******", closeTrees.get(i).getTitle());
+                mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1, mBuilder.build());
             }
         }
 
@@ -148,7 +166,22 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
             closeTrees = createCloseTreeArray(treeMarkers);
         }
 
+    }*/
+
+    /*@Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
     }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }*/
 
     private Location getMyLocation() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -168,10 +201,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         return latLng;
     }*/
 
-    private ArrayList<Marker> createCloseTreeArray(ArrayList<Marker> list){
+    private ArrayList<Marker> createCloseTreeArray(ArrayList<Marker> list) {
         Location myLocation = getMyLocation();
         ArrayList<Marker> close = new ArrayList<Marker>();
-        for( int i=0;i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             Location treeLocation = new Location("");
             treeLocation.setLatitude(list.get(i).getPosition().latitude);
             treeLocation.setLongitude(list.get(i).getPosition().longitude);
