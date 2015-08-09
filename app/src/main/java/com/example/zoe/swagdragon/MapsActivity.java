@@ -146,7 +146,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
 
     public boolean onMarkerClick(Marker m) {
         Intent intent = new Intent(this, TreeInfoActivity.class);
-        intent.putExtra(TreeInfoActivity.INFOEXTRA, m.getSnippet());
+        intent.putExtra(TreeInfoActivity.INFOEXTRA, m.getTitle());
         startActivity(intent);
         // Need to get the info from the tree being clicked
         return true;

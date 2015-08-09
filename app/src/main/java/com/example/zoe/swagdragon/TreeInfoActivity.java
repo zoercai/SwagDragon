@@ -17,8 +17,10 @@ public class TreeInfoActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         String desc = i.getStringExtra(INFOEXTRA);
-        TextView t = (TextView)findViewById(R.id.textfield);
-        t.setText(desc);
+        if (desc != null) {
+            TextView t = (TextView) findViewById(R.id.description);
+            t.setText(desc);
+        }
     }
 
 
