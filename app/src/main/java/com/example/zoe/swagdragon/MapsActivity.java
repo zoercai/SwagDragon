@@ -33,6 +33,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         setUpTreeData();
@@ -133,7 +135,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
 
             while ((line = csvReader.readNext()) != null) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
-                        .title(line[6]) .snippet(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
+                        .title(line[6]) .snippet(line[2])
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
                 Log.v("*******line*****", Double.parseDouble(line[1]) + "" + line[0] + " " + line[6] + "");
                 mMap.setOnMarkerClickListener(this);
             }
@@ -147,8 +150,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
     public boolean onMarkerClick(Marker m) {
         Intent intent = new Intent(this, TreeInfoActivity.class);
         intent.putExtra(TreeInfoActivity.INFOEXTRA, m.getTitle());
+        intent.putExtra(TreeInfoActivity.INFOID, m.getSnippet());
         startActivity(intent);
-        // Need to get the info from the tree being clicked
         return true;
     }
 }
