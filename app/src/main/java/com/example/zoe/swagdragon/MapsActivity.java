@@ -3,12 +3,15 @@ package com.example.zoe.swagdragon;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.location.LocationListener;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -26,8 +29,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener {
+import java.util.ArrayList;
+
+public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener, LocationListener {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available
+    public ArrayList<Marker> treeMarkers = new ArrayList<Marker>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +45,10 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
         setUpMapIfNeeded();
         setUpTreeData();
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.treenotify);
-        mBuilder.setContentTitle("New trees detected around you!");
-        mBuilder.setContentText("There are new notable trees around you, check it out and leave a message!");
 
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, NotificationService.class);
+        this.startService(intent);
 
-        // notificationID allows you to update the notification later on.
-        mNotificationManager.notify(1, mBuilder.build());
     }
     /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
@@ -111,7 +112,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
         String provider = locationManager.getBestProvider(criteria, true);
         Location myLocation = locationManager.getLastKnownLocation(provider);
 
-
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         double latitude = myLocation.getLatitude();
         double longitude = myLocation.getLongitude();
@@ -134,6 +134,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
             csvReader.readNext();
 
             while ((line = csvReader.readNext()) != null) {
+                Marker newMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
+                        .title(line[6]).icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
+                treeMarkers.add(newMarker);
                 mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(line[1]), Double.parseDouble(line[0])))
                         .title(line[6]) .snippet(line[2])
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.tree)));
@@ -147,6 +150,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
         }
     }
 
+
     public boolean onMarkerClick(Marker m) {
         Intent intent = new Intent(this, TreeInfoActivity.class);
         intent.putExtra(TreeInfoActivity.INFOEXTRA, m.getTitle());
@@ -154,4 +158,39 @@ public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMarke
         startActivity(intent);
         return true;
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Getting latitude of the current location
+        double latitude = location.getLatitude();
+
+        // Getting longitude of the current location
+        double longitude = location.getLongitude();
+
+        // Creating a LatLng object for the current location
+        LatLng latLng = new LatLng(latitude, longitude);
+
+        // Showing the current location in Google Map
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        // Zoom in the Google Map
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
+
